@@ -1,0 +1,27 @@
+next_due: Int;
+
+chore = 
+    SELECT id as choreid, name, interval
+        FROM ChoresTable
+
+for(chore in chores) {
+    last_done =
+        db.query("SELECT date as last_done
+            FROM choreentry
+            WHERE choreid = " + chore.choreid +
+            " ORDER BY date desc
+            LIMIT 1");
+    last_done_date = convert_to_java_date(last_done);
+    next_due = (last_done_date + interval) - 'now'
+}
+
+-----------
+OR:
+-----------
+SELECT id, name, interval FROM ChoresTable
+    (SELECT date AS last_done FROM ChoreEntryTable
+        WHERE choreid = id
+        GROUP BY date desc
+        LIMIT 1) AS last_done,
+    (SELECT Case((julianday(last_done, '+'+interval+'days') - julianday('now')) AS Integer) AS next_due
+    ORDER BY next_due ASC)
