@@ -1,5 +1,6 @@
 package com.taylor.recurring;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,33 +11,28 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    //Testing vars
-    private ArrayList<String> mNames = new ArrayList<>();
-    private ArrayList<String> mDues = new ArrayList<>();
+    private ArrayList<ChoreItem> mChoreList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Create some test data
-        initTestDataset();
+        //Get list of Chores from local DB
+        updateChoreList();
 
-        //Find our recycler view in the activity
-        RecyclerView choreListRecyclerView = findViewById(R.id.chore_list_recycler_view);
-
-        //Construct our adapter
-        ChoreListAdapter choreListAdapter = new ChoreListAdapter(mNames, mDues);
-
-        //Plug them together
-        choreListRecyclerView.setAdapter(choreListAdapter);
-
-        //Set the layout manager for our recycler view
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        choreListRecyclerView.setLayoutManager(layoutManager);
+        setRecyclerLayoutManger();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == 5) {
+            updateChoreList();
+        }
     }
 
     @Override
@@ -57,15 +53,35 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+         if (id == R.id.action_new_chore) {
+            Intent intent = new Intent(MainActivity.this, NewChoreActivity.class);
+            intent.putExtra("key", -1); //id of a "new" chore is -1
+            MainActivity.this.startActivityForResult(intent, 5);
+
+            updateChoreList();
+         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void initTestDataset() {
-        mNames.add("Clean the toilet");
-        mDues.add("Due in 1 day");
-
-        mNames.add("Vacuum the livingroom");
-        mDues.add("Due in 3 day");
+    private void setRecyclerLayoutManger() {
+        RecyclerView choreListRecyclerView = findViewById(R.id.chore_list_recycler_view);
+        //Set the layout manager for our recycler view
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        choreListRecyclerView.setLayoutManager(layoutManager);
     }
+
+    private void updateChoreList() {
+        //Find our recycler view in the activity
+        RecyclerView choreListRecyclerView = findViewById(R.id.chore_list_recycler_view);
+        //Get list of Chores from local DB
+        DatabaseHelper db_helper = new DatabaseHelper();
+        mChoreList = db_helper.get_chore_list(getApplicationContext());
+        //Construct our adapter
+        ChoreListAdapter choreListAdapter = new ChoreListAdapter(mChoreList);
+
+        //Plug them together
+        choreListRecyclerView.setAdapter(choreListAdapter);
+    }
+
 }

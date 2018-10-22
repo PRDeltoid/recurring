@@ -6,4 +6,9 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/action_new_chore"
+        android:title="New Chore"
+        android:icon="@drawable/plus"
+        android:orderInCategory="1"
+        app:showAsAction="always"/>
 </menu>

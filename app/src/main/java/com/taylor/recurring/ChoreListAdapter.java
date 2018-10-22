@@ -1,17 +1,18 @@
 package com.taylor.recurring;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class ChoreListAdapter extends RecyclerView.Adapter<com.taylor.recurring.ChoreListAdapter.ViewHolder> {
-    private ArrayList<String> mNames;
-    private ArrayList<String> mDues;
+    private ArrayList<ChoreItem> mChoreList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name;
@@ -23,12 +24,23 @@ public class ChoreListAdapter extends RecyclerView.Adapter<com.taylor.recurring.
             name = itemView.findViewById(R.id.name);
             dueIn = itemView.findViewById(R.id.due_in);
             parentLayout = itemView.findViewById(R.id.chore_list_item);
+
+            /*itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    CharSequence text = "Hello toast!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
+            });*/
         }
     }
 
-    public ChoreListAdapter(ArrayList<String> names, ArrayList<String> dues) {
-        mNames = names;
-        mDues = dues;
+    public ChoreListAdapter(ArrayList<ChoreItem> chores) {
+        mChoreList = chores;
     }
 
     @Override
@@ -41,12 +53,12 @@ public class ChoreListAdapter extends RecyclerView.Adapter<com.taylor.recurring.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         //Place data into our View
-        holder.name.setText(mNames.get(position));
-        holder.dueIn.setText(mDues.get(position));
+        holder.name.setText(mChoreList.get(position).getName());
+        holder.dueIn.setText(mChoreList.get(position).getDueIn());
     }
 
     @Override
     public int getItemCount() {
-        return mNames.size();
+        return mChoreList.size();
     }
 }
